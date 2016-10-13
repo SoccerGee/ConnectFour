@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161013034540) do
+ActiveRecord::Schema.define(version: 20161013060723) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(version: 20161013034540) do
     t.integer  "winner_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["winner_id"], name: "index_games_on_winner_id", using: :btree
   end
 
   create_table "games_players", id: false, force: :cascade do |t|
@@ -35,23 +36,27 @@ ActiveRecord::Schema.define(version: 20161013034540) do
     t.integer  "game_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["game_id"], name: "index_moves_on_game_id", using: :btree
+    t.index ["player_id"], name: "index_moves_on_player_id", using: :btree
   end
 
   create_table "player_types", force: :cascade do |t|
-    t.string "type"
+    t.string "name"
+    t.index ["name"], name: "index_player_types_on_name", unique: true, using: :btree
   end
 
   create_table "players", force: :cascade do |t|
     t.string   "email"
     t.string   "pin"
-    t.integer  "type"
+    t.integer  "type_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_players_on_email", unique: true, using: :btree
+    t.index ["type_id"], name: "index_players_on_type_id", using: :btree
   end
 
   add_foreign_key "games", "players", column: "winner_id"
   add_foreign_key "moves", "games"
   add_foreign_key "moves", "players"
-  add_foreign_key "players", "player_types", column: "type"
+  add_foreign_key "players", "player_types", column: "type_id"
 end

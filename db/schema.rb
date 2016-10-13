@@ -16,11 +16,11 @@ ActiveRecord::Schema.define(version: 20161013025016) do
   enable_extension "plpgsql"
 
   create_table "games", force: :cascade do |t|
-    t.integer  "red_player_id"
-    t.integer  "black_player_id"
     t.integer  "winner_id"
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
+    t.integer  "black_player_id"
+    t.integer  "red_player_id"
   end
 
   create_table "moves", force: :cascade do |t|
@@ -44,8 +44,6 @@ ActiveRecord::Schema.define(version: 20161013025016) do
     t.datetime "updated_at", null: false
   end
 
-  add_foreign_key "games", "players", column: "black_player_id"
-  add_foreign_key "games", "players", column: "red_player_id"
   add_foreign_key "moves", "games"
   add_foreign_key "moves", "players"
   add_foreign_key "players", "player_types", column: "type"

@@ -1,0 +1,11 @@
+<h1>Sign in, player!</h1>
+<%= form_for @player, url: { action: "create_session" } do |f| %>
+  <%= f.label  :email %> :
+  <%= f.text_field :email %> <br />
+
+  <%= f.label :pin %> :
+  <%= f.text_field :pin %> <br />
+
+  <%= f.submit "Sign In" %>
+  <%= link_to 'Cancel', root_path  %>
+<% end %>

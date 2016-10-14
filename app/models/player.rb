@@ -3,18 +3,12 @@ class Player < ApplicationRecord
   has_many :moves
   has_and_belongs_to_many :games
 
-  #This will return the CPU Player Object
-  scope :cpu, -> { where(
-    type_id: ActiveRecord::Base.connection.exec_query("
-      SELECT id FROM player_types WHERE name='cpu' ").first["id"])
-  }
+  validates :email, presence: { message: 'email must be present' }
+  validates :email, uniqueness: { message: 'this email is already in use.  Did you forget your pin? Shame on you.' }
 
-  #getting the type name of a Player record.
-  def type
-    db_query_result = ActiveRecord::Base.connection.exec_query("
-      SELECT player_types.name FROM players
-      INNER JOIN player_types
-      ON players.type_id = player_types.id
-      WHERE players.id=#{self.id}").first["name"]
-  end
+  validates :pin,   presence: { message: 'pin must be present' }
+  validates :pin,   length: { is: 4, message: 'pin must be 4 characters long.' }
+
+  #This will return the CPU Player Object
+  scope :cpu, -> { where( is_cpu: true ) }
 end

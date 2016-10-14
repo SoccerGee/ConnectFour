@@ -1,3 +1,11 @@
 Rails.application.routes.draw do
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+  root 'player#index'
+
+  resources :player, only: [:create, :new]
+
+  get 'sign_in' => 'player#new_session', :as => :new_player_session
+  post 'sign_in' => 'player#create_session', :as => :create_player_session
+  delete 'sign_out' => 'player#sign_out', :as => :destroy_player_session
+
+
 end

@@ -4,4 +4,8 @@ require "application_helper"
 conn = ActiveRecord::Base.connection()
 
 # default cpu user
-Player.create email: "connectfour@salesloft.com", pin: "1337", is_cpu: true
+User.create {
+  email: "grant.tuttle@gmail.com",
+  password: "1337gamez",
+  is_cpu: true
+}

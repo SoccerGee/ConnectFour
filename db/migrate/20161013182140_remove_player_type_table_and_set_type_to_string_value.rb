@@ -11,7 +11,7 @@ class RemovePlayerTypeTableAndSetTypeToStringValue < ActiveRecord::Migration[5.0
 
     remove_foreign_key :players, column: :type_id
 
-    if Player.exists?
+    if defined? Player
       Player.first.update(type_id: nil) # There is only one at this point.
     end
 
@@ -19,7 +19,7 @@ class RemovePlayerTypeTableAndSetTypeToStringValue < ActiveRecord::Migration[5.0
     rename_column :players, :type_id, :is_cpu
     change_column_default :players, :is_cpu, false
 
-    if Player.exists?
+    if defined? Player
       Player.first.update is_cpu: true
     end
 

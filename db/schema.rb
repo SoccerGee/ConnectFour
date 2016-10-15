@@ -64,8 +64,8 @@ ActiveRecord::Schema.define(version: 20161015174242) do
   end
 
   add_foreign_key "games", "users", column: "winner_id"
-  add_foreign_key "games_users", "games"
-  add_foreign_key "games_users", "users"
+  add_foreign_key "games_users", "games", on_delete: :cascade
+  add_foreign_key "games_users", "users", on_delete: :cascade
   add_foreign_key "moves", "games"
   add_foreign_key "moves", "users"
 end

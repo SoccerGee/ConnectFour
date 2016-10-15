@@ -9,5 +9,4 @@ class User < ApplicationRecord
 
   #This will return the CPU Player Object
   scope :cpu, -> { where( is_cpu: true ) }
-
 end

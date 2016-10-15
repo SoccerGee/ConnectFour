@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161015171724) do
+ActiveRecord::Schema.define(version: 20161015173334) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,11 +22,11 @@ ActiveRecord::Schema.define(version: 20161015171724) do
     t.index ["winner_id"], name: "index_games_on_winner_id", using: :btree
   end
 
-  create_table "games_players", id: false, force: :cascade do |t|
-    t.integer "game_id",   null: false
-    t.integer "player_id", null: false
-    t.index ["game_id"], name: "index_games_players_on_game_id", using: :btree
-    t.index ["player_id"], name: "index_games_players_on_player_id", using: :btree
+  create_table "games_users", id: false, force: :cascade do |t|
+    t.integer "game_id", null: false
+    t.integer "user_id", null: false
+    t.index ["game_id"], name: "index_games_users_on_game_id", using: :btree
+    t.index ["user_id"], name: "index_games_users_on_user_id", using: :btree
   end
 
   create_table "moves", force: :cascade do |t|
@@ -64,5 +64,7 @@ ActiveRecord::Schema.define(version: 20161015171724) do
   end
 
   add_foreign_key "games", "users", column: "winner_id"
+  add_foreign_key "games_users", "games"
+  add_foreign_key "games_users", "users"
   add_foreign_key "moves", "games"
 end

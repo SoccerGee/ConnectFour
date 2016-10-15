@@ -5,21 +5,18 @@
 <table>
   <thead>
     <tr>
-      <th colspan="3"></th>
+      <th>Created</th>
+      <th>Last Move</th>
     </tr>
   </thead>
 
   <tbody>
     <% @games.each do |game| %>
       <tr>
+        <td><%= game.created_at.localtime.strftime("%b %d @ %I:%M%p") %></td>
+        <td><%= game.updated_at.localtime.strftime("%b %d @ %I:%M%p") %></td>
         <td><%= link_to 'Show', game %></td>
-        <td><%= link_to 'Edit', edit_game_path(game) %></td>
-        <td><%= link_to 'Destroy', game, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
-
-<br>
-
-<%= link_to 'New Game', new_game_path %>

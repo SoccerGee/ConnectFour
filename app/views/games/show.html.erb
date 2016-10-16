@@ -1,5 +1,7 @@
 <p id="notice"><%= notice %></p>
 
-<%= render %>
+<div class="board">
+  <%= display_game_moves %>
+</div>
 
 <%= link_to 'Back', user_games_path(current_user) %>

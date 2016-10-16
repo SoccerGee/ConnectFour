@@ -9,4 +9,7 @@ module ApplicationHelper
     render partial: "/partials/nav/#{partial}"
   end
 
+  def display_game_moves
+    render template: "/moves/new" if @game.winner.blank?
+  end
 end

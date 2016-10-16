@@ -25,6 +25,10 @@ class MovesController < ApplicationController
   # POST /moves.json
   def create
     @move = Move.new(move_params)
+    @move.game = Game.find game_params[:game_id]
+    @move.user = current_user
+
+    cpu_turn
 
     respond_to do |format|
       if @move.save
@@ -67,8 +71,16 @@ class MovesController < ApplicationController
       @move = Move.find(params[:id])
     end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
     def move_params
-      params.fetch(:move, {})
+      params.require(:move).permit(:x_loc,:y_loc)
+    end
+
+    def game_params
+      params.permit(:game_id)
+    end
+
+    def cpu_turn
+      move = Move.cpu_turn(current_user, game_params[:game_id])
+      #GameChannel.broadcast_to(@game, move)
     end
 end

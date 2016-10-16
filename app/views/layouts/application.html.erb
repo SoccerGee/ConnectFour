@@ -11,6 +11,10 @@
   <body>
     <%= nav_bar %>
     <%= yield %>
+    <%= javascript_tag do -%>
+      var application_url = "<%= request.base_url %>";
+      var application_path = "<%= request.fullpath %>";
+    <% end -%>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js' %>
   </body>

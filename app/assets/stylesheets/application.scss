@@ -15,3 +15,17 @@
  */
 
 body { padding-top: 70px; }
+.board table {
+
+  border: solid black 2px;
+
+  tr {
+
+    td {
+
+      border: solid black 2px;
+      height: 40px;
+      width: 40px;
+    }
+  }
+}

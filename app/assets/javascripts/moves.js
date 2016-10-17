@@ -10,7 +10,7 @@ $(document).ready(function(){
     };
 
     $.post(post_url, { move: data }, function(response){
-      target.css({'background-color':'red'});
+      placeMove(target,'red');
     });
 
   });
@@ -20,10 +20,14 @@ $(document).ready(function(){
     var get_url = application_url+application_path+'/moves.json';
     $.get(get_url, function(response){
       for(var i = 0; i < response.length; i++) {
-        $(response[i].selector).css({'background-color':'red'});
+        placeMove($(response[i].selector),'red');
       }
     });
   })();
 
-  App.cable.subscriptions.create({ channel: "GameChannel" });
+
+  var placeMove = function(elem, color){
+    elem.css({'background-color': color});
+  }
 });
+

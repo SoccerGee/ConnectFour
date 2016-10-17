@@ -13,26 +13,21 @@ class Move < ApplicationRecord
 
   validates_uniqueness_of :x_loc, :scope => [:y_loc, :game_id]
 
-  def self.cpu_turn user_id, game_id
-    GameChannel.broadcast_to(user_id, title: 'hello!!!', body: "MISTER PERSON!")
+  scope :cpu_moves,  -> { where(user_id: User.cpu.first.id ) }
+
+  def self.cpu_turn
+    moves = Move.select(:x_loc,:y_loc)
+                  .where(user_id: user_id)
+                  .where(game_id: game_id)
+                  .pluck(:x_loc,:y_loc)
+    make_cpu_move
   end
- ##def self.cpu_turn user_id, game_id
 
- ##  moves = Move.select(:x_loc,:y_loc).where(user_id: user_id).where(game_id: game_id).pluck(:x_loc,:y_loc)
+  private
 
- ##  cpu_x = rand(0..MAX_X)
- ##  cpu_y = rand(0..MAX_Y)
- ##  begin
-
- ##    move = Move.create(x_loc: cpu_x, y_loc: cpu_y, user_id: user_id, game_id: game_id)
- ##    if move
- ##      return move
- ##    else
- ##      cpu_x = rand(0..MAX_X)
- ##      cpu_y = rand(0..MAX_Y)
- ##    end
-
- ##  end until moves.include? [cpu_x, cpu_y]
-
- ##end
+  def make_cpu_move
+    begin
+      move = Move.create(x_loc: rand(0..MAX_X), y_loc: rand(0..MAX_Y), user_id: User.cpu.first.id, game_id: 14)
+    end until move.errors.blank?
+  end
 end

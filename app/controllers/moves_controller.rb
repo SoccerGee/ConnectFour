@@ -30,9 +30,9 @@ class MovesController < ApplicationController
 
     respond_to do |format|
       if @move.save
+        cpu_turn
         format.html { redirect_to @move, notice: 'Move was successfully created.' }
         format.json { render :show, status: :created, location: @move }
-        cpu_turn
       else
         format.html { render :new }
         format.json { render json: @move.errors, status: :unprocessable_entity }
@@ -65,6 +65,9 @@ class MovesController < ApplicationController
   end
 
   private
+    def sort_moves
+
+    end
     # Use callbacks to share common setup or constraints between actions.
     def set_move
       @move = Move.find(params[:id])

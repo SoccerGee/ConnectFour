@@ -28,12 +28,11 @@ class MovesController < ApplicationController
     @move.game = Game.find game_params[:game_id]
     @move.user = current_user
 
-    cpu_turn
-
     respond_to do |format|
       if @move.save
         format.html { redirect_to @move, notice: 'Move was successfully created.' }
         format.json { render :show, status: :created, location: @move }
+        cpu_turn
       else
         format.html { render :new }
         format.json { render json: @move.errors, status: :unprocessable_entity }
@@ -80,7 +79,6 @@ class MovesController < ApplicationController
     end
 
     def cpu_turn
-      move = Move.cpu_turn(current_user, game_params[:game_id])
-      #GameChannel.broadcast_to(@game, move)
+      Move.cpu_turn(current_user[:id], game_params[:game_id])
     end
 end

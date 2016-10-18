@@ -1,4 +1,3 @@
-<p id="notice"><%= notice %></p>
-
-<%= link_to 'Edit', edit_move_path(@move) %> |
-<%= link_to 'Back', moves_path %>
+<h1> WINNER: <%= @game.winner_id == current_user.id ? "YOU!!" : "CPU!?" %></h1>
+<%= render '/partials/game/board', move: @move %>
+<%= javascript_include_tag "load_moves.js", defer: true %>

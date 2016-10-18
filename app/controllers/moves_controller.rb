@@ -1,10 +1,12 @@
 class MovesController < ApplicationController
   before_action :set_move, only: [:show, :edit, :update, :destroy]
+  before_action :set_game, only: :create
 
   # GET /moves
   # GET /moves.json
   def index
-    @moves = Move.all
+    set_game
+    @moves = @game.moves.group_by { |move| move.user == User.cpu.first ? :move : :cpu_move  }
   end
 
   # GET /moves/1
@@ -17,22 +19,29 @@ class MovesController < ApplicationController
     @move = Move.new
   end
 
-  # GET /moves/1/edit
+  # get /moves/1/edit
   def edit
   end
 
-  # POST /moves
-  # POST /moves.json
+  # post /moves
+  # post /moves.json
   def create
-    @move = Move.new(move_params)
-    @move.game = Game.find game_params[:game_id]
+    @move = new_move
     @move.user = current_user
 
     respond_to do |format|
       if @move.save
-        cpu_turn
-        format.html { redirect_to @move, notice: 'Move was successfully created.' }
-        format.json { render :show, status: :created, location: @move }
+        @cpu_move = cpu_turn
+        @cpu_move.save if @game.is_over? == false
+
+        if @game.is_over?
+          winner = @game.winner_id == User.cpu.first.id ? "The CPU" : "You"
+          format.html { redirect_to @game, notice: "#{winner} won!" }
+          format.json { redirect_to @game, notice: "#{winner} won!" }
+        else
+          format.html { redirect_to @move, notice: 'Move was successfully created.' }
+          format.json { render :show, status: :created, location: @move }
+        end
       else
         format.html { render :new }
         format.json { render json: @move.errors, status: :unprocessable_entity }
@@ -65,16 +74,22 @@ class MovesController < ApplicationController
   end
 
   private
-    def sort_moves
-
-    end
-    # Use callbacks to share common setup or constraints between actions.
     def set_move
-      @move = Move.find(params[:id])
+      @move = Move.find(move_params[:id])
+    end
+
+    def new_move
+      move = Move.new(move_params)
+      move.game = @game
+      move
+    end
+
+    def set_game
+      @game = Game.find(game_params[:game_id])
     end
 
     def move_params
-      params.require(:move).permit(:x_loc,:y_loc)
+      params.require(:move).permit(:move,:x_loc,:y_loc,:format)
     end
 
     def game_params
@@ -82,6 +97,9 @@ class MovesController < ApplicationController
     end
 
     def cpu_turn
-      Move.cpu_turn(current_user[:id], game_params[:game_id])
+      a_cpu_move = new_move
+      a_cpu_move.user = User.cpu.first
+      a_cpu_move.make_cpu_move
+      a_cpu_move
     end
 end

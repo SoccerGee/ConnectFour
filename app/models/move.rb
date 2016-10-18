@@ -1,33 +1,53 @@
 class Move < ApplicationRecord
+  START_VAL = 1
   MAX_X = 7
   MAX_Y = 6
+
+  attr_accessor :win
 
   belongs_to :user
   belongs_to :game
 
   validates :x_loc, presence: true
-  validates :y_loc, presence: true
 
   validates_numericality_of :x_loc, less_than_or_equal_to: MAX_X
+  validates_numericality_of :x_loc, greater_than_or_equal_to: START_VAL
+
   validates_numericality_of :y_loc, less_than_or_equal_to: MAX_Y
+  validates_numericality_of :y_loc, greater_than_or_equal_to: START_VAL
 
-  validates_uniqueness_of :x_loc, :scope => [:y_loc, :game_id]
+  before_create :slide_to_the_bottom
+  after_create :winning_move?
 
-  scope :cpu_moves,  -> { where(user_id: User.cpu.first.id ) }
+  scope :cpu_moves, -> { where(user_id: User.cpu.first.id ) }
 
-  def self.cpu_turn
-    moves = Move.select(:x_loc,:y_loc)
-                  .where(user_id: user_id)
-                  .where(game_id: game_id)
-                  .pluck(:x_loc,:y_loc)
-    make_cpu_move
+
+  def make_cpu_move
+    begin
+      self.x_loc = rand(START_VAL..MAX_X)
+      self.y_loc = rand(START_VAL..MAX_Y)
+    end until valid_move?
+    self
   end
 
   private
 
-  def make_cpu_move
-    begin
-      move = Move.create(x_loc: rand(0..MAX_X), y_loc: rand(0..MAX_Y), user_id: User.cpu.first.id, game_id: 14)
-    end until move.errors.blank?
+  def winning_move?
+    self.game.winning_move? self
+  end
+
+  def slide_to_the_bottom
+    self.y_loc = 1
+    until bottom_most?
+      self.y_loc += 1
+    end
+  end
+
+  def valid_move?
+    self.valid? && bottom_most?
+  end
+
+  def bottom_most?
+    self.game.moves.find_by(x_loc:x_loc, y_loc: self.y_loc).blank?
   end
 end

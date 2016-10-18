@@ -10,6 +10,10 @@ module ApplicationHelper
   end
 
   def display_game_moves
-    render template: "/moves/new" if @game.winner.blank?
+    if @game.winner.blank?
+      render template: "/moves/new"
+    else
+      render template: "/moves/show"
+    end
   end
 end

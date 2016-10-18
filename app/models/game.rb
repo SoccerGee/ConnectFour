@@ -15,7 +15,7 @@ class Game < ApplicationRecord
   def winning_move? move
     @user_moves = self.moves.where("user_id = ?",move.user.id)
 
-    if vertical_win?(move) || horizontal_win?(move)
+    if vertical_win?(move) || horizontal_win?(move) || diagonal_win?(move)
       self.winner_id = move.user.id
       self.save
     end
@@ -37,6 +37,12 @@ class Game < ApplicationRecord
   end
 
   def horizontal_win? move
+    arr = @user_moves.where(y_loc: move.y_loc).pluck(:x_loc).sort
+    arr.each_cons(2).all? {|a,b| b == a + 1 } if four_or_more? arr
+  end
+
+  def diagonal_win? move
+    binding.pry
     arr = @user_moves.where(y_loc: move.y_loc).pluck(:x_loc).sort
     arr.each_cons(2).all? {|a,b| b == a + 1 } if four_or_more? arr
   end

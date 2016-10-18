@@ -5,9 +5,11 @@
 .rbenv-version
 .sass-cache
 
-log/*.log
-/tags
+log/*
+!/log/.keep
 tmp/
+!/tmp/.keep
+/tags
 
 db/*.sqlite3
 config/database.yml
@@ -17,3 +19,7 @@ public/assets
 public/uploads
 
 vendor/assets/components/**/*.min.*
+
+.byebug_history
+
+config/local_env.yml

@@ -10,7 +10,6 @@ class GamesController < ApplicationController
   # GET /games/1
   # GET /games/1.json
   def show
-    set_game
     @moves = @game.moves
   end
 
@@ -65,17 +64,27 @@ class GamesController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
     def set_game
-      @game = Game.find(params[:id])
+      @game = Game.find(game_params[:id])
     end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
     def game_params
-      params.permit(:game_id)
+      params.permit(:id)
     end
 
     def assign_for_user
-      @game.for_user = current_user
+      current_user.games << @game
     end
+
+    # TODO: dry this up from application helper
+    def who_won? game
+      if game.winner_id == nil
+        "In Progress"
+      elsif game.winner_id == current_user.id
+        "You"
+      else
+        "CPU"
+      end
+    end
+
 end

@@ -8,5 +8,5 @@ class User < ApplicationRecord
   has_and_belongs_to_many :games
 
   #This will return the CPU Player Object
-  scope :cpu, -> { where( is_cpu: true ) }
+  scope :cpu, -> { where( is_cpu: true ).first }
 end

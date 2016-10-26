@@ -14,7 +14,7 @@
   <tbody>
     <% @games.each do |game| %>
       <tr>
-        <td><%= did_i_win?(game) ? "WIN" : "LOSE" %></td>
+        <td><%= who_won?(game) %></td>
         <td><%= game.created_at.localtime.strftime("%b %d @ %I:%M%p") %></td>
         <td><%= game.updated_at.localtime.strftime("%b %d @ %I:%M%p") %></td>
         <td><%= link_to 'Show', game %></td>

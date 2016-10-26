@@ -9,8 +9,14 @@ module ApplicationHelper
     render partial: "/partials/nav/#{partial}"
   end
 
-  def did_i_win? game
-    game.winner_id == current_user.id
+  def who_won? game
+    if game.winner_id == nil
+      "In Progress"
+    elsif game.winner_id == current_user.id
+      "You"
+    else
+      "CPU"
+    end
   end
 
   def display_game_moves

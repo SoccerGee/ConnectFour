@@ -1,12 +1,13 @@
 class MovesController < ApplicationController
   before_action :set_move, only: [:show, :edit, :update, :destroy]
   before_action :set_game, only: :create
+  before_action :set_board, only: :create
 
   # GET /moves
   # GET /moves.json
   def index
-    set_game
-    @moves = @game.moves.group_by { |move| move.user == User.cpu.first ? :move : :cpu_move  }
+    @game = Game.find(game_params[:game_id])
+    @moves = @game.moves.group_by { |move| move.user == User.cpu ? :move : :cpu_move  }
   end
 
   # GET /moves/1
@@ -26,22 +27,21 @@ class MovesController < ApplicationController
   # post /moves
   # post /moves.json
   def create
-    @move = new_move
-    @move.user = current_user
+    @move = Move.new(move_params)
+    @game.moves << @move
 
     respond_to do |format|
       if @move.save
-        @cpu_move = cpu_turn
-        @cpu_move.save if @game.is_over? == false
 
+        @cpu_move = cpu_turn
         if @game.is_over?
-          winner = @game.winner_id == User.cpu.first.id ? "The CPU" : "You"
-          format.html { redirect_to @game, notice: "#{winner} won!" }
-          format.json { redirect_to @game, notice: "#{winner} won!" }
+          format.html { redirect_to @game, notice: "#{@game.winner} won!" }
+          format.json { redirect_to @game, notice: "#{@game.winner} won!" }
         else
           format.html { redirect_to @move, notice: 'Move was successfully created.' }
           format.json { render :show, status: :created, location: @move }
         end
+
       else
         format.html { render :new }
         format.json { render json: @move.errors, status: :unprocessable_entity }
@@ -78,18 +78,8 @@ class MovesController < ApplicationController
       @move = Move.find(move_params[:id])
     end
 
-    def new_move
-      move = Move.new(move_params)
-      move.game = @game
-      move
-    end
-
-    def set_game
-      @game = Game.find(game_params[:game_id])
-    end
-
     def move_params
-      params.require(:move).permit(:move,:x_loc,:y_loc,:format)
+      params.require(:move).merge(user_id: current_user.id, game_id: game_params[:game_id]).permit(:x_loc, :y_loc, :user_id, :game_id)
     end
 
     def game_params
@@ -97,9 +87,20 @@ class MovesController < ApplicationController
     end
 
     def cpu_turn
-      a_cpu_move = new_move
-      a_cpu_move.user = User.cpu.first
-      a_cpu_move.make_cpu_move
-      a_cpu_move
+      return nil if @game.is_over?
+
+      cpu_move = Move.new(user_id: User.cpu.id, game_id: @game.id, y_loc: 1)
+      cpu_move = @board.best_cpu_move cpu_move
+      @game.moves << cpu_move
+      cpu_move.save
+      cpu_move
+    end
+
+    def set_game
+      @game = Game.find(game_params[:game_id])
+    end
+
+    def set_board
+      @board = BoardService.new(game: @game, cpu: User.cpu, player: current_user)
     end
 end

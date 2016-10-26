@@ -10,11 +10,14 @@ $(document).ready(function(){
     };
 
     $.post(post_url, { move: data }, function(response){
-      var user_dom = getDomFromMove(response.move.x_loc, response.move.y_loc);
-      var cpu_dom = getDomFromMove(response.cpu_move.x_loc, response.cpu_move.y_loc);
-
-      placeMove(user_dom,'red');
-      placeMove(cpu_dom,"pink");
+      if(response.move) {
+        var user_dom = getDomFromMove(response.move.x_loc, response.move.y_loc);
+        placeMove(user_dom,'red');
+      }
+      if(response.cpu_move) {
+        var cpu_dom = getDomFromMove(response.cpu_move.x_loc, response.cpu_move.y_loc);
+        placeMove(cpu_dom,"pink");
+      }
     });
 
   });

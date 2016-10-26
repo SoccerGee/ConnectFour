@@ -20,6 +20,6 @@ module Connectfour
       end if File.exists?(env_file)
     end
 
-    config.autoload_paths += %W(#{config.root}/app)
+    config.autoload_paths += %W( #{config.root}/app )
   end
 end

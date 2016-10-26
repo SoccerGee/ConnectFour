@@ -28,12 +28,12 @@ class MovesController < ApplicationController
   # post /moves.json
   def create
     @move = Move.new(move_params)
-    @game.moves << @move
 
     respond_to do |format|
       if @move.save
-
+        @game.moves << @move
         @cpu_move = cpu_turn
+
         if @game.is_over?
           format.html { redirect_to @game, notice: "#{@game.winner} won!" }
           format.json { redirect_to @game, notice: "#{@game.winner} won!" }
@@ -90,8 +90,10 @@ class MovesController < ApplicationController
       return nil if @game.is_over?
 
       cpu_move = Move.new(user_id: User.cpu.id, game_id: @game.id, y_loc: 1)
-      cpu_move = @board.best_cpu_move cpu_move
+      cpu_move = @game.board_service.best_cpu_move cpu_move
+
       @game.moves << cpu_move
+
       cpu_move.save
       cpu_move
     end
@@ -101,6 +103,6 @@ class MovesController < ApplicationController
     end
 
     def set_board
-      @board = BoardService.new(game: @game, cpu: User.cpu, player: current_user)
+      @game.board_service = BoardService.new(game: @game, cpu: User.cpu, player: current_user)
     end
 end

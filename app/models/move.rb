@@ -8,6 +8,8 @@ class Move < ApplicationRecord
   belongs_to :user
   belongs_to :game
 
+  before_create :slide_to_bottom
+
   validates :x_loc, presence: true
   validates_numericality_of :x_loc, less_than_or_equal_to: MAX_X
   validates_numericality_of :x_loc, greater_than_or_equal_to: START_VAL
@@ -47,6 +49,14 @@ class Move < ApplicationRecord
 
   def assign_user
     self.user = @user
+  end
+
+  def slide_to_bottom
+    self.y_loc = 1
+
+    until self.valid? do
+      self.y_loc += 1
+    end
   end
 
 end

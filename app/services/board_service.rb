@@ -1,23 +1,67 @@
 class BoardService
+  require 'User'
+
+  attr_accessor :board
+
   def initialize params
     @player = params[:player]
     @game   = params[:game]
     @cpu    = params[:cpu]
+    @moves  = @game.moves
+    @board ||= setup_board
+  end
+
+  def add_to_board move
+    space = @board.get_space move.x_loc, move.y_loc
+    space.user_id = move.user_id
+    space.move_id = move.id
   end
 
   def best_cpu_move a_cpu_move
-    if threat = find_threat
-      a_cpu_move.assign_attributes( threat )
+    #if threat = find_threat
+    #  a_cpu_move.assign_attributes( threat )
 #    elsif opportunity = find_opportunity
 #      a_cpu_move = opportunity
-    else
+    #else
       a_cpu_move = a_cpu_move.go
-    end
+    #end
 
     return a_cpu_move
   end
 
+  def did_win_with_move? move
+    column   = @board.user_moves_in_column   move.x_loc, move.user_id
+    row      = @board.user_moves_in_row      move.y_loc, move.user_id
+    diagonal = @board.user_moves_in_diagonal move.x_loc, move.y_loc, move.user_id
+
+    win_in_column?(column) || win_in_row?(row) || win_in_diagonal?(diagonal)
+  end
+
   private
+    def win_in_column? column
+      return false if column.blank? || column.length < Game::CONSECUTIVE_FOR_WIN
+      consecutive=[]
+      column.each do |space|
+        consecutive << space if consecutive.blank?
+        consecutive << space if consecutive[-1].y+1 == space.y
+      end
+      return consecutive.length >= Game::CONSECUTIVE_FOR_WIN
+    end
+
+    def win_in_row? row
+      return false if row.blank? || row.length < Game::CONSECUTIVE_FOR_WIN
+      consecutive=[]
+      row.each do |space|
+        consecutive << space if consecutive.blank?
+        consecutive << space if consecutive[-1].x+1 == space.x
+      end
+      return consecutive.length >= Game::CONSECUTIVE_FOR_WIN
+    end
+
+    def win_in_diagonal? diagonal
+      return false if diagonal.blank? || diagonal.length < Game::CONSECUTIVE_FOR_WIN
+
+    end
 
     def find_opportunity
       @user_moves = self.moves.where(user_id: User.cpu.id).to_a
@@ -70,14 +114,7 @@ class BoardService
     end
 
     def find_threat
-      @user_moves = @game.moves.where.not(user_id: @cpu.id).to_a
-
-      return nil if @user_moves.size < Game::CONSECUTIVE_FOR_THREAT
-
-      last_move_column_num = @user_moves.first.x_loc
-      last_move_row_num = @user_moves.first.y_loc
-
-      column_moves = moves_in_column last_move_column_num
+      column_moves = moves_in_column_for_user last_move_column_num, @cpu
       if column_moves.length >= Game::CONSECUTIVE_FOR_THREAT
         column_hash = get_consecutive_moves_in_column column_moves
         column_has_threat = column_hash.detect{ |k,v| v.length == Game::CONSECUTIVE_FOR_THREAT }
@@ -87,8 +124,7 @@ class BoardService
       row_moves = moves_in_row last_move_row_num
       if row_moves.length >= Game::CONSECUTIVE_FOR_THREAT
         row_hash = get_consecutive_moves_in_row row_moves
-        threat = evaluate_row_threats row_hash
-        return { x_loc: threat }
+        return { x_loc: row_hash[:possible_threats].first }
       end
 
       #moves = get_consecutive_moves_in_diagonal(@user_moves.last.pluck(:x_loc, :yloc))
@@ -97,15 +133,8 @@ class BoardService
       #end
     end
 
-    def moves_in_column column_number
-      @user_moves.select { |move| move.x_loc == column_number }
-    end
-
-    def moves_in_row row_number
-      @user_moves.select { |move| move.y_loc == row_number }
-    end
-
     def get_consecutive_moves_in_column moves
+
       sorted_moves = moves.sort { |x,y| x.y_loc <=> y.y_loc }
       consecutive_moves = {}
       index=1
@@ -125,7 +154,7 @@ class BoardService
       return consecutive_moves
     end
 
-    def get_consecutive_moves_in_row moves
+    def map_moves_in_row moves
       consecutive_moves = {
         possible_threats: [],
             real_threats: [],
@@ -184,26 +213,30 @@ class BoardService
            user.id != User.cpu.id       # check if it has previously been blocked
       end
 
-      # if there is not a cpu move ontop of the threatening column 
+      # if there is not a cpu move ontop of the threatening column
       # then move then the column is a threat
       return next_consecutive_opponent_move.nil?
     end
 
-    def evaluate_row_threats moves_hash
-      binding.pry
-      # grab from consecutive moves sets that
-      #   have a length of three
-      #     beginning before x_loc = 6
-      moves_hash
+    def setup_board
+      # setup the structs
+      board = Board.new # possible_threats, real_threats, spaces
 
-      #   have a length of two or more
-      #     separated by one blank
-      #       from another consecutive set
-      #       with 1 or more
-      #if the_moves.blank?
-      #end
+      # scan across the x axis
+      (1..Move::MAX_X).each do |x_loc_index|
+        # scan across the y axis
+        (1..Move::MAX_Y).each do |y_loc_index|
 
-      #return if the_moves.blank?
+          if move = @moves.select {|m| m.x_loc == x_loc_index && m.y_loc == y_loc_index }.first
+            board.new_space(move.x_loc, move.y_loc, move.user_id, move.id)
+          else
+            board.new_space(x_loc_index, y_loc_index)
+          end
+
+        end
+      end
+
+      board
     end
 
 end

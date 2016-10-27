@@ -91,10 +91,10 @@ class MovesController < ApplicationController
 
       cpu_move = Move.new(user_id: User.cpu.id, game_id: @game.id, y_loc: 1)
       cpu_move = @game.board_service.best_cpu_move cpu_move
+      cpu_move.save
 
       @game.moves << cpu_move
 
-      cpu_move.save
       cpu_move
     end
 

@@ -1,6 +1,4 @@
 class BoardService
-  require 'User'
-
   attr_accessor :board
 
   def initialize params

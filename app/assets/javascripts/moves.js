@@ -16,7 +16,7 @@ $(document).ready(function(){
       }
       if(response.cpu_move) {
         var cpu_dom = getDomFromMove(response.cpu_move.x_loc, response.cpu_move.y_loc);
-        placeMove(cpu_dom,"pink");
+        placeMove(cpu_dom,"black");
       }
     });
 

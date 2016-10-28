@@ -3,7 +3,7 @@
   var get_url = application_url+application_path+'/moves.json';
   $.get(get_url, function(response){
     for(var i = 0; i < response.length; i++) {
-      var color = response[i].cpu ? 'pink' : 'red';
+      var color = response[i].cpu ? 'black' : 'red';
       placeMove($(response[i].selector), color );
     }
   });

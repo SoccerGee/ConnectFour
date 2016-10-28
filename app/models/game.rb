@@ -16,10 +16,6 @@ class Game < ApplicationRecord
     self.moves.where(user_id: user_id).sort.to_a
   end
 
-  def evaluate_moves
-    #TODO: needs to be the loop and preparation for the moves called at initialization
-  end
-
   private
 
   def winning_move?(move)

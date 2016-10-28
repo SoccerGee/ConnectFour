@@ -33,14 +33,6 @@ class Move < ApplicationRecord
     self.x_loc + n
   end
 
-  def go
-    begin
-      self.x_loc = rand(START_VAL..MAX_X)
-      self.y_loc = rand(START_VAL..MAX_Y)
-    end until self.valid?
-    self
-  end
-
   def is_cpu?
     self.user_id == User.cpu.id
   end

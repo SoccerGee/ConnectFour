@@ -78,16 +78,16 @@ class BoardService
     def n_consecutive_in_diagonal diagonal, n
       return false if diagonal.blank? || diagonal.length < n
 
-      consecutive=[]
-
       sorted_diagonal = diagonal.sort {|a,b|a.y<=>b.y} # ascending along y means up!
 
+      consecutive=[]
       sorted_diagonal.each do |space|
         consecutive << space if consecutive.blank?
         consecutive << space if consecutive[-1].x+1 == space.x && consecutive[-1].y+1 == space.y
       end
       return true if consecutive.length >= n
 
+      consecutive = []
       sorted_diagonal.each do |space|
         consecutive << space if consecutive.blank?
         consecutive << space if consecutive[-1].x-1 == space.x && consecutive[-1].y+1 == space.y
